@@ -1,0 +1,95 @@
+[
+  {
+    "id": "portfolio-dashboard",
+    "title": "Portfolio Website with Admin Dashboard",
+    "summary": "Responsive portfolio with interactive dashboard (add/edit/delete projects & skills), auth (login/register), messaging system with activity logs. Data persisted via Local Storage.",
+    "cover": "/public/images/hamedportfolio.png",
+    "liveUrl": "https://portfolio-dashboard-jade.vercel.app/",
+    "repoUrl": "https://github.com/hhaamed74/portfolio.git",
+    "tech": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Local Storage",
+      "Responsive",
+      "Dashboard",
+      "Auth"
+    ]
+  },
+  {
+    "id": "advanced-to-do-list",
+    "title": "Advanced To-Do List",
+    "summary": "Tasks with categories and priorities, responsive UI, and persistence with Local Storage.",
+    "cover": "/public/images/todolist.png",
+    "liveUrl": "https://advanced-to-do-list-three.vercel.app/",
+    "repoUrl": "https://github.com/hhaamed74/Advanced-To-Do-List.git",
+    "tech": [
+      "HTML",
+      "CSS",
+      "Sass",
+      "JavaScript",
+      "Local Storage",
+      "Responsive",
+      "Productivity"
+    ],
+    "views": 120
+  },
+  {
+    "id": "ecommerce-site",
+    "title": "E-commerce Website",
+    "summary": "Responsive app with authentication, product listings, favorites, shopping cart, dynamic navigation, and toast notifications. Data persisted in Local Storage.",
+    "cover": "/public/images/ecommerce.png",
+    "liveUrl": "https://e-commerce-henna-kappa-57.vercel.app/#",
+    "repoUrl": "https://github.com/hhaamed74/E-commerce.git",
+    "tech": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Local Storage",
+      "Auth",
+      "Cart",
+      "Favorites",
+      "Toasts",
+      "Responsive"
+    ],
+    "views": 50
+  },
+  {
+    "id": "scientific-graphing-calculator",
+    "title": "Calculator (Scientific + Graphing)",
+    "summary": "Scientific calculator with built-in graphing: DEG/RAD modes, math.js (no eval), Chart.js plotting, keyboard support, history (localStorage), and dark/light theme.",
+    "cover": "/public/images/Graphing Calculator.png",
+    "liveUrl": "https://scientific-graphing-calculator.vercel.app/",
+    "repoUrl": "https://github.com/hhaamed74/Scientific-Graphing-Calculator.git",
+    "tech": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "math.js",
+      "Chart.js",
+      "Local Storage",
+      "Dark/Light Mode"
+    ],
+    "views": 100
+  },
+  {
+    "id": "lynkr",
+    "title": "Lynkr – Social Media Platform",
+    "summary": "Full social app with posts (create/edit/delete/save/share), stories with replies & reactions, nested comments with reaction counters, messenger with media, profile & settings, notifications, Dark/Light, EN/AR i18n. Persisted via IndexedDB & Local Storage.",
+    "cover": "/public/images/lynkr.png",
+    "liveUrl": "https://lynkr-three.vercel.app/",
+    "repoUrl": "https://github.com/hhaamed74/Lynkr.git",
+    "tech": [
+      "React",
+      "TypeScript",
+      "Vite",
+      "IndexedDB",
+      "Local Storage",
+      "i18n",
+      "EN/AR",
+      "Dark/Light Mode",
+      "SPA"
+    ],
+    "views": 110
+  }
+]

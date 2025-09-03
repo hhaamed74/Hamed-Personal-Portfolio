@@ -3,7 +3,7 @@
     "id": "portfolio-dashboard",
     "title": "Portfolio Website with Admin Dashboard",
     "summary": "Responsive portfolio with interactive dashboard (add/edit/delete projects & skills), auth (login/register), messaging system with activity logs. Data persisted via Local Storage.",
-    "cover": "/public/hamedportfolio.png",
+    "cover": "/hamedportfolio.png",
     "liveUrl": "https://portfolio-dashboard-jade.vercel.app/",
     "repoUrl": "https://github.com/hhaamed74/portfolio.git",
     "tech": [
@@ -20,7 +20,7 @@
     "id": "advanced-to-do-list",
     "title": "Advanced To-Do List",
     "summary": "Tasks with categories and priorities, responsive UI, and persistence with Local Storage.",
-    "cover": "/public/todolist.png",
+    "cover": "/todolist.png",
     "liveUrl": "https://advanced-to-do-list-three.vercel.app/",
     "repoUrl": "https://github.com/hhaamed74/Advanced-To-Do-List.git",
     "tech": [
@@ -38,7 +38,7 @@
     "id": "ecommerce-site",
     "title": "E-commerce Website",
     "summary": "Responsive app with authentication, product listings, favorites, shopping cart, dynamic navigation, and toast notifications. Data persisted in Local Storage.",
-    "cover": "/public/ecommerce.png",
+    "cover": "/ecommerce.png",
     "liveUrl": "https://e-commerce-henna-kappa-57.vercel.app/#",
     "repoUrl": "https://github.com/hhaamed74/E-commerce.git",
     "tech": [
@@ -58,7 +58,7 @@
     "id": "scientific-graphing-calculator",
     "title": "Calculator (Scientific + Graphing)",
     "summary": "Scientific calculator with built-in graphing: DEG/RAD modes, math.js (no eval), Chart.js plotting, keyboard support, history (localStorage), and dark/light theme.",
-    "cover": "/public/Graphing Calculator.png",
+    "cover": "/Graphing Calculator.png",
     "liveUrl": "https://scientific-graphing-calculator.vercel.app/",
     "repoUrl": "https://github.com/hhaamed74/Scientific-Graphing-Calculator.git",
     "tech": [
@@ -76,7 +76,7 @@
     "id": "lynkr",
     "title": "Lynkr – Social Media Platform",
     "summary": "Full social app with posts (create/edit/delete/save/share), stories with replies & reactions, nested comments with reaction counters, messenger with media, profile & settings, notifications, Dark/Light, EN/AR i18n. Persisted via IndexedDB & Local Storage.",
-    "cover": "/public/lynkr.png",
+    "cover": "/lynkr.png",
     "liveUrl": "https://lynkr-three.vercel.app/",
     "repoUrl": "https://github.com/hhaamed74/Lynkr.git",
     "tech": [

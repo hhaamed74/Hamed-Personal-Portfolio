@@ -13,6 +13,9 @@ import {
   Tooltip,
   Snackbar,
   Alert,
+  Box,
+  useTheme,
+  alpha,
 } from "@mui/material";
 import {
   OpenInNew as OpenInNewIcon,
@@ -20,7 +23,7 @@ import {
   Share as ShareIcon,
 } from "@mui/icons-material";
 import type { Project } from "../types/project";
-import { getTechChipSx } from "../utils/techColors"; //  ألوان ثابتة
+import { getTechChipSx } from "../utils/techColors";
 
 type Props = {
   project: Project;
@@ -28,6 +31,7 @@ type Props = {
 };
 
 export default function ProjectCard({ project, onOpen }: Props) {
+  const theme = useTheme();
   const [snack, setSnack] = useState<{ open: boolean; msg: string }>({
     open: false,
     msg: "",
@@ -38,16 +42,7 @@ export default function ProjectCard({ project, onOpen }: Props) {
 
   const copyToClipboard = async (text: string) => {
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-      }
+      await navigator.clipboard.writeText(text);
       setSnack({ open: true, msg: "Link copied to clipboard" });
     } catch {
       setSnack({ open: true, msg: "Failed to copy link" });
@@ -56,104 +51,180 @@ export default function ProjectCard({ project, onOpen }: Props) {
 
   const shareProject = async (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    try {
-      if ("share" in navigator) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (navigator as any).share({
+    if ("share" in navigator) {
+      try {
+        await (navigator as Navigator).share({
           title: project.title,
           text: project.summary,
           url,
         });
-      } else {
-        await copyToClipboard(url);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        /* user cancelled */
       }
-    } catch {
-      /* ignore */
+    } else {
+      await copyToClipboard(url);
     }
   };
 
   return (
     <>
-      <Card elevation={2} sx={{ borderRadius: 2, height: "100%" }}>
-        <CardActionArea onClick={() => onOpen?.(project)}>
-          {project.cover && (
-            <CardMedia
-              component="img"
-              height="160"
-              image={project.cover}
-              alt={project.title}
-              sx={{ objectFit: "cover" }}
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: 4,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          border: "1px solid",
+          borderColor: "divider",
+          overflow: "hidden",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          "&:hover": {
+            transform: "translateY(-8px)",
+            boxShadow: `0 12px 30px ${alpha(theme.palette.common.black, 0.12)}`,
+            borderColor: "primary.main",
+            "& .project-card-media": {
+              transform: "scale(1.08)",
+            },
+          },
+        }}
+      >
+        <CardActionArea onClick={() => onOpen?.(project)} sx={{ flexGrow: 1 }}>
+          <Box sx={{ position: "relative", overflow: "hidden" }}>
+            {project.cover && (
+              <CardMedia
+                component="img"
+                height="180"
+                image={project.cover}
+                alt={project.title}
+                className="project-card-media"
+                sx={{
+                  objectFit: "cover",
+                  transition: "transform 0.5s ease",
+                }}
+              />
+            )}
+            {/* Gradient Overlay */}
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4))",
+              }}
             />
-          )}
+          </Box>
 
-          <CardContent>
-            <Typography variant="h6" fontWeight={700} gutterBottom noWrap>
+          <CardContent sx={{ pt: 3, pb: 1 }}>
+            <Typography
+              variant="h6"
+              fontWeight={800}
+              gutterBottom
+              noWrap
+              sx={{ letterSpacing: "-0.02em" }}
+            >
               {project.title}
             </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.8 }} paragraph>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                lineHeight: 1.6,
+                mb: 2,
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                minHeight: "4.8em",
+              }}
+            >
               {project.summary}
             </Typography>
 
-            {/* ✅ شارات ملوّنة داخل الكارت */}
-            <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-              {project.tech.slice(0, 6).map((t) => (
+            <Stack direction="row" spacing={0.8} useFlexGap flexWrap="wrap">
+              {project.tech.slice(0, 4).map((t) => (
                 <Chip
                   key={t}
                   label={t}
                   size="small"
                   sx={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    borderRadius: 1.5,
                     ...getTechChipSx(t),
-                    // منع فتح المودال عند الضغط على الشارة
                     "& *": { pointerEvents: "none" },
                   }}
                   onMouseDown={(e) => e.stopPropagation()}
                 />
               ))}
-              {project.tech.length > 6 && (
-                <Chip
-                  size="small"
-                  label={`+${project.tech.length - 6}`}
-                  variant="outlined"
-                  onMouseDown={(e) => e.stopPropagation()}
-                />
+              {project.tech.length > 4 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    alignSelf: "center",
+                    opacity: 0.6,
+                    fontWeight: 700,
+                    ml: 0.5,
+                  }}
+                >
+                  +{project.tech.length - 4} more
+                </Typography>
               )}
             </Stack>
           </CardContent>
         </CardActionArea>
 
-        <CardActions sx={{ justifyContent: "space-between", px: 2, pb: 2 }}>
-          <Stack direction="row" spacing={1}>
+        <CardActions
+          sx={{ justifyContent: "space-between", px: 2, pb: 2, pt: 0 }}
+        >
+          <Box>
             {project.repoUrl && (
-              <Tooltip title="Repository">
+              <Tooltip title="GitHub Repo">
                 <IconButton
+                  size="small"
                   component="a"
                   href={project.repoUrl}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label="Repository"
+                  sx={{
+                    color: "text.secondary",
+                    "&:hover": { color: "primary.main" },
+                  }}
                 >
-                  <GitHubIcon />
+                  <GitHubIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             )}
             {project.liveUrl && (
-              <Tooltip title="Live demo">
+              <Tooltip title="Live Demo">
                 <IconButton
+                  size="small"
                   component="a"
                   href={project.liveUrl}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label="Live demo"
+                  sx={{
+                    color: "text.secondary",
+                    "&:hover": { color: "primary.main" },
+                  }}
                 >
-                  <OpenInNewIcon />
+                  <OpenInNewIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             )}
-          </Stack>
+          </Box>
 
-          <Tooltip title="Share">
-            <IconButton aria-label="Share project" onClick={shareProject}>
-              <ShareIcon />
+          <Tooltip title="Share Project">
+            <IconButton
+              size="small"
+              onClick={shareProject}
+              sx={{
+                color: "text.secondary",
+                "&:hover": { color: "primary.main" },
+              }}
+            >
+              <ShareIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </CardActions>
@@ -161,16 +232,11 @@ export default function ProjectCard({ project, onOpen }: Props) {
 
       <Snackbar
         open={snack.open}
-        autoHideDuration={1400}
+        autoHideDuration={2000}
         onClose={() => setSnack({ open: false, msg: "" })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert
-          onClose={() => setSnack({ open: false, msg: "" })}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
+        <Alert severity="success" variant="filled" sx={{ borderRadius: 2 }}>
           {snack.msg}
         </Alert>
       </Snackbar>

@@ -1,7 +1,14 @@
 // src/redux/slices/authSlice.ts
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
+import * as authService from "../../services/auth";
 
+/* =========================
+   الأنواع (Types)
+   ========================= */
 export interface User {
   username: string;
   email: string;
@@ -11,48 +18,86 @@ export interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
 }
 
-const isUser = (u: any): u is User =>
-  u &&
-  typeof u.username === "string" &&
-  typeof u.email === "string" &&
-  (u.gender === "male" || u.gender === "female" || u.gender === "other");
+/* =========================
+   العمليات (Async Thunks)
+   ========================= */
 
-const loadUser = (): User | null => {
-  try {
-    const raw = localStorage.getItem("currentUser");
-    const parsed = raw ? JSON.parse(raw) : null;
-    return isUser(parsed) ? parsed : null;
-  } catch {
-    return null;
+export const loginAsync = createAsyncThunk(
+  "auth/login",
+  async ({ id, pwd }: { id: string; pwd: string }, { rejectWithValue }) => {
+    try {
+      return await authService.loginUser(id, pwd);
+    } catch (error: unknown) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "خطأ غير معروف"
+      );
+    }
   }
-};
+);
+
+export const registerAsync = createAsyncThunk(
+  "auth/register",
+  async (data: authService.RegisterData, { rejectWithValue }) => {
+    try {
+      return await authService.registerUser(data);
+    } catch (error: unknown) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "خطأ غير معروف"
+      );
+    }
+  }
+);
 
 const initialState: AuthState = {
-  user: loadUser(),
-  isAuthenticated: !!loadUser(),
+  user: authService.getCurrentUser(),
+  isAuthenticated: !!authService.getCurrentUser(),
+  loading: false,
+  error: null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    login: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
-      state.isAuthenticated = true;
-    },
     logout: (state) => {
+      authService.logoutUser();
       state.user = null;
       state.isAuthenticated = false;
     },
-    setFromStorage: (state) => {
-      const u = loadUser();
-      state.user = u;
-      state.isAuthenticated = !!u;
+    clearError: (state) => {
+      state.error = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginAsync.fulfilled, (state, action: PayloadAction<User>) => {
+        // ✅ هنا استخدمنا PayloadAction عشان كده التحذير هيختفي
+        state.loading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
+      })
+      .addCase(loginAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(
+        registerAsync.fulfilled,
+        (state, action: PayloadAction<User>) => {
+          state.user = action.payload;
+          state.isAuthenticated = true;
+          state.loading = false;
+        }
+      );
   },
 });
 
-export const { login, logout, setFromStorage } = authSlice.actions;
+export const { logout, clearError } = authSlice.actions;
 export default authSlice.reducer;

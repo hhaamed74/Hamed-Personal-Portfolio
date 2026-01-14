@@ -1,68 +1,158 @@
-import { Container, Typography, Divider, Stack } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Divider,
+  Stack,
+  Box,
+  Paper,
+  useTheme,
+} from "@mui/material";
+
+// استيراد الأيقونات بطريقة تمنع مشاكل TypeScript
+import {
+  Gavel as GavelIcon,
+  InfoOutlined as InfoIcon,
+  Copyright as CopyrightIcon,
+  CheckCircleOutline as AcceptIcon,
+  WarningAmberOutlined as WarningIcon,
+  Update as UpdateIcon,
+} from "@mui/icons-material";
 
 export default function Terms() {
+  const theme = useTheme();
+
+  /**
+   * دالة مساعدة لرسم العناوين مع الأيقونات بشكل متسق
+   */
+  const SectionHeader = ({
+    icon: Icon,
+    title,
+  }: {
+    icon: React.ElementType;
+    title: string;
+  }) => (
+    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
+      <Icon color="primary" sx={{ fontSize: 24 }} />
+      <Typography variant="h6" fontWeight={700}>
+        {title}
+      </Typography>
+    </Stack>
+  );
+
   return (
-    <Container sx={{ py: 6 }}>
-      <Typography variant="h4" fontWeight={800} gutterBottom>
-        Terms of Use
-      </Typography>
-      <Typography sx={{ opacity: 0.7, mb: 2 }}>
-        Last updated: {new Date().toLocaleDateString()}
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
+    <Container sx={{ py: 8, maxWidth: "md" }}>
+      {/* Header Section */}
+      <Box sx={{ mb: 5, textAlign: "center" }}>
+        <GavelIcon color="primary" sx={{ fontSize: 50, mb: 2 }} />
+        <Typography variant="h3" fontWeight={900} gutterBottom>
+          Terms of Use
+        </Typography>
+        <Typography sx={{ opacity: 0.6 }}>
+          Last updated: {new Date().toLocaleDateString("en-GB")}
+        </Typography>
+      </Box>
 
-      <Stack spacing={2}>
-        <section>
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Purpose
-          </Typography>
-          <Typography>
-            This website is a personal portfolio demonstrating front-end work
-            and projects. It is provided for informational purposes only.
-          </Typography>
-        </section>
+      <Divider sx={{ mb: 5 }} />
 
-        <section>
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Content & ownership
+      <Stack spacing={5}>
+        {/* Purpose */}
+        <Box>
+          <SectionHeader icon={InfoIcon} title="Purpose" />
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ lineHeight: 1.7 }}
+          >
+            This website serves as a professional portfolio to showcase
+            <b> Full-Stack development</b> expertise, technical projects, and
+            skills. The content is provided for informational and demonstration
+            purposes only.
           </Typography>
-          <Typography>
-            All project descriptions, visuals, and code samples are owned by
-            their respective authors. External brands and logos belong to their
+        </Box>
+
+        {/* Content & Ownership */}
+        <Box>
+          <SectionHeader icon={CopyrightIcon} title="Content & Ownership" />
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ lineHeight: 1.7 }}
+          >
+            All project descriptions, custom visuals, and source code samples
+            are the intellectual property of the author unless stated otherwise.
+            External brands, logos, and trademarks belong to their respective
             owners.
           </Typography>
-        </section>
+        </Box>
 
-        <section>
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Acceptable use
+        {/* Acceptable Use */}
+        <Box>
+          <SectionHeader icon={AcceptIcon} title="Acceptable Use" />
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ lineHeight: 1.7 }}
+          >
+            By accessing this site, you agree not to:
+            <ul>
+              <li>Attempt to disrupt the website’s security or performance.</li>
+              <li>
+                Use any automated systems (bots) to scrape data without
+                permission.
+              </li>
+              <li>
+                Misrepresent the authorship of the projects displayed here.
+              </li>
+            </ul>
           </Typography>
-          <Typography>
-            You agree not to misuse the website, attempt unauthorized access, or
-            interfere with its normal operation.
-          </Typography>
-        </section>
+        </Box>
 
-        <section>
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Warranty & liability
+        {/* Warranty & Liability */}
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 3,
+            borderRadius: 3,
+            bgcolor:
+              theme.palette.mode === "dark"
+                ? "rgba(255,183,77,0.05)"
+                : "#fff9f0",
+            borderColor: "#ffb74d",
+          }}
+        >
+          <SectionHeader icon={WarningIcon} title="Warranty & Liability" />
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ lineHeight: 1.7 }}
+          >
+            The site is provided <b>“as is”</b>. While I strive for accuracy, I
+            provide no warranties regarding the completeness or reliability of
+            the information. I am not liable for any damages arising from the
+            use of this site or reliance on its content.
           </Typography>
-          <Typography>
-            The site is provided “as is” without warranties of any kind. We are
-            not liable for any damages arising from your use of the site or
-            external links.
-          </Typography>
-        </section>
+        </Paper>
 
-        <section>
-          <Typography variant="h6" fontWeight={700} gutterBottom>
-            Changes
+        {/* Changes */}
+        <Box sx={{ textAlign: "center", pt: 2 }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            justifyContent="center"
+            alignItems="center"
+            sx={{ mb: 1 }}
+          >
+            <UpdateIcon color="primary" fontSize="small" />
+            <Typography variant="h6" fontWeight={700}>
+              Changes to Terms
+            </Typography>
+          </Stack>
+          <Typography variant="body2" color="text.secondary">
+            I reserve the right to update these terms at any time. Your
+            continued use of the website signifies your acceptance of any
+            changes.
           </Typography>
-          <Typography>
-            We may update these Terms at any time. Continued use means you
-            accept the latest version.
-          </Typography>
-        </section>
+        </Box>
       </Stack>
     </Container>
   );

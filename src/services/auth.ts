@@ -1,32 +1,23 @@
+// src/services/auth.ts
 import type { User } from "../redux/slices/authSlice";
 
-type Gender = User["gender"];
+export type Gender = User["gender"];
 
-type RegisterData = {
+export type RegisterData = {
   username: string;
   email: string;
   password: string;
   gender: Gender;
 };
 
-/**
- * نقبل الشكلين:
- * - Legacy: فيه password نصّي
- * - New:    فيه passwordHash + salt (PBKDF2)
- */
 type StoredUser =
+  | { username: string; email: string; gender: Gender; password: string }
   | {
       username: string;
       email: string;
       gender: Gender;
-      password: string; // LEGACY
-    }
-  | {
-      username: string;
-      email: string;
-      gender: Gender;
-      passwordHash: string; // base64
-      salt: string; // base64
+      passwordHash: string;
+      salt: string;
     };
 
 const USERS_KEY = "users";
@@ -53,51 +44,9 @@ const isStoredUser = (u: unknown): u is StoredUser => {
   return legacy || modern;
 };
 
-const isUser = (u: unknown): u is User => {
-  if (typeof u !== "object" || u === null) return false;
-  const obj = u as Record<string, unknown>;
-  return (
-    typeof obj.username === "string" &&
-    typeof obj.email === "string" &&
-    isGender(obj.gender)
-  );
-};
-
 /* =========================
-   Storage helpers
+   Crypto Utils
    ========================= */
-const loadUsers = (): StoredUser[] => {
-  try {
-    const raw = localStorage.getItem(USERS_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isStoredUser);
-  } catch {
-    return [];
-  }
-};
-
-const saveUsers = (users: StoredUser[]) => {
-  try {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  } catch {
-    // ignore
-  }
-};
-
-const saveCurrentUser = (user: User) => {
-  try {
-    localStorage.setItem(CURRENT_KEY, JSON.stringify(user));
-  } catch {
-    // ignore
-  }
-};
-
-/* =========================
-   Base64 & Crypto utils
-   ========================= */
-
-// toBase64: من ArrayBuffer → base64 (ASCII-safe)
 const toBase64 = (buf: ArrayBuffer): string => {
   const bytes = new Uint8Array(buf);
   let bin = "";
@@ -105,80 +54,72 @@ const toBase64 = (buf: ArrayBuffer): string => {
   return btoa(bin);
 };
 
-// fromBase64: من base64 → ArrayBuffer
 const fromBase64ToArrayBuffer = (b64: string): ArrayBuffer => {
   const bin = atob(b64);
-  const len = bin.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
-  return bytes.buffer; // ✅ ArrayBuffer صريح
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
 };
 
-const enc = new TextEncoder();
-
-// genSalt: يولّد ArrayBuffer ثم يخزّنه base64
-const genSaltB64 = (bytes = 16): string => {
-  const arr = new Uint8Array(bytes);
-  crypto.getRandomValues(arr);
-  return toBase64(arr.buffer as ArrayBuffer);
-};
-
-// PBKDF2: نمرّر الملح كـ ArrayBuffer (مش Uint8Array) عشان يرضي BufferSource
 async function pbkdf2(
   password: string,
   saltB64: string,
-  iterations = 150_000,
-  lengthBits = 256
+  iterations = 150_000
 ): Promise<string> {
+  const enc = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
-    enc.encode(password), // Uint8Array مسموح هنا
+    enc.encode(password),
     { name: "PBKDF2" },
     false,
     ["deriveBits"]
   );
-  const saltBuf: ArrayBuffer = fromBase64ToArrayBuffer(saltB64);
+  const saltBuf = fromBase64ToArrayBuffer(saltB64);
   const bits = await crypto.subtle.deriveBits(
     { name: "PBKDF2", hash: "SHA-256", salt: saltBuf, iterations },
     keyMaterial,
-    lengthBits
+    256
   );
   return toBase64(bits);
 }
 
 /* =========================
-   Public API (async)
+   Storage Helpers
+   ========================= */
+const loadUsers = (): StoredUser[] => {
+  const raw = localStorage.getItem(USERS_KEY);
+  const parsed: unknown = raw ? JSON.parse(raw) : [];
+  return Array.isArray(parsed) ? parsed.filter(isStoredUser) : [];
+};
+
+const saveUsers = (users: StoredUser[]) => {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+};
+
+/* =========================
+   Public API
    ========================= */
 
+// ✅ تم تعديلها لإزالة any
 export async function registerUser(data: RegisterData): Promise<User> {
-  // sanitize + validate
-  const username = (data.username ?? "").toString().trim();
-  const email = (data.email ?? "").toString().trim();
-  const password = (data.password ?? "").toString();
-
-  if (!username) throw new Error("Username is required");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
-    throw new Error("Invalid email address");
-  if (password.length < 6)
-    throw new Error("Password must be at least 6 characters");
-  if (!isGender(data.gender)) throw new Error("Invalid gender");
-
   const users = loadUsers();
-  const exists = users.some(
-    (u) =>
-      u.username.toLowerCase() === username.toLowerCase() ||
-      u.email.toLowerCase() === email.toLowerCase()
-  );
-  if (exists) throw new Error("Username or email already exists");
 
-  // PBKDF2 + salt
-  const salt = genSaltB64();
-  const passwordHash = await pbkdf2(password, salt);
+  // التحقق من وجود المستخدم مسبقاً
+  if (
+    users.some((u) => u.email === data.email || u.username === data.username)
+  ) {
+    throw new Error("المستخدم موجود بالفعل");
+  }
+
+  const salt = toBase64(crypto.getRandomValues(new Uint8Array(16)).buffer);
+  const passwordHash = await pbkdf2(data.password, salt);
+
+  // استخدام Destructuring لاستبعاد password وإنشاء كائن جديد نظيف
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { password: _, ...userInfo } = data;
 
   const newUser: StoredUser = {
-    username,
-    email,
-    gender: data.gender,
+    ...userInfo,
     passwordHash,
     salt,
   };
@@ -186,78 +127,45 @@ export async function registerUser(data: RegisterData): Promise<User> {
   users.push(newUser);
   saveUsers(users);
 
-  const publicUser: User = { username, email, gender: newUser.gender };
-  saveCurrentUser(publicUser);
-  return publicUser;
+  return { username: data.username, email: data.email, gender: data.gender };
 }
 
-export async function loginUser(
-  identifier: string,
-  passwordIn: string
-): Promise<User> {
-  const id = (identifier ?? "").toString().trim().toLowerCase();
-  const pwd = (passwordIn ?? "").toString();
-
+export async function loginUser(id: string, pwdIn: string): Promise<User> {
   const users = loadUsers();
-  const idx = users.findIndex(
-    (u) => u.username.toLowerCase() === id || u.email.toLowerCase() === id
+  const found = users.find(
+    (u) =>
+      u.username.toLowerCase() === id.toLowerCase() ||
+      u.email.toLowerCase() === id.toLowerCase()
   );
-  const found = idx >= 0 ? users[idx] : undefined;
 
-  if (!found) throw new Error("No account matches this username/email");
+  if (!found) throw new Error("بيانات الدخول غير صحيحة");
 
-  // Legacy → migration
   if ("password" in found) {
-    if (found.password !== pwd) throw new Error("Wrong password");
-
-    const salt = genSaltB64();
-    const passwordHash = await pbkdf2(pwd, salt);
-    const migrated: StoredUser = {
-      username: found.username,
-      email: found.email,
-      gender: found.gender,
-      passwordHash,
-      salt,
-    };
-    users[idx] = migrated;
-    saveUsers(users);
-
-    const publicUser: User = {
-      username: migrated.username,
-      email: migrated.email,
-      gender: migrated.gender,
-    };
-    saveCurrentUser(publicUser);
-    return publicUser;
+    if (found.password !== pwdIn) throw new Error("كلمة السر خطأ");
+  } else {
+    const calc = await pbkdf2(pwdIn, found.salt);
+    if (calc !== found.passwordHash) throw new Error("كلمة السر خطأ");
   }
-
-  // Modern: قارن الـ hash
-  const calc = await pbkdf2(pwd, found.salt);
-  if (calc !== found.passwordHash) throw new Error("Wrong password");
 
   const publicUser: User = {
     username: found.username,
     email: found.email,
     gender: found.gender,
   };
-  saveCurrentUser(publicUser);
+
+  localStorage.setItem(CURRENT_KEY, JSON.stringify(publicUser));
   return publicUser;
 }
 
-export function logoutUser() {
-  try {
-    localStorage.removeItem(CURRENT_KEY);
-  } catch {
-    // ignore
-  }
-}
-
-export function getCurrentUser(): User | null {
+export const getCurrentUser = (): User | null => {
   try {
     const raw = localStorage.getItem(CURRENT_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : null;
-    return isUser(parsed) ? parsed : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed;
   } catch {
     return null;
   }
-}
+};
+
+export const logoutUser = () => localStorage.removeItem(CURRENT_KEY);

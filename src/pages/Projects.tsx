@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import {
   Alert,
   Box,
@@ -17,385 +17,310 @@ import {
   Skeleton,
   Stack,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 
+// Assets & Icons
+import promanager from "../assets/promanager.png";
+import hamedstore from "../assets/hamedstore.png";
 import {
   OpenInNew as OpenInNewIcon,
   GitHub as GitHubIcon,
   FilterAltOff as FilterAltOffIcon,
+  TrendingUp as TrendingUpIcon,
 } from "@mui/icons-material";
 
+// Components & Hooks
 import ProjectCard from "../components/ProjectCard";
 import { useProjects } from "../hooks/useProjects";
 import type { Project } from "../types/project";
-import { getTechChipSx } from "../utils/techColors";
-type ViewsMap = Record<string, number>;
-const VIEWS_KEY = "project-views";
 
-const loadViews = (): ViewsMap => {
-  try {
-    const raw = localStorage.getItem(VIEWS_KEY);
-    return raw ? (JSON.parse(raw) as ViewsMap) : {};
-  } catch {
-    return {};
-  }
-};
-
-const saveViews = (v: ViewsMap) => {
-  try {
-    localStorage.setItem(VIEWS_KEY, JSON.stringify(v));
-  } catch {
-    // ignore
-  }
-};
-
-type SortKey = "newest" | "oldest" | "popular" | "least";
+type SortKey = "newest" | "oldest" | "popular";
+const VIEWS_KEY = "portfolio_local_views";
 
 export default function Projects() {
-  // API
-  const { data, loading, error, refetch } = useProjects(); // /projects.json
+  const { data: apiData, loading, error, refetch } = useProjects();
 
-  // search & filters
   const [query, setQuery] = useState("");
-  const [activeTech, setActiveTech] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortKey>("newest");
-
-  // modal
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Project | null>(null);
+  const [localViews, setLocalViews] = useState<Record<string, number>>({});
 
-  // views (local)
-  const [views, setViews] = useState<ViewsMap>(() => loadViews());
-  const bumpView = (id: string) => {
-    setViews((prev) => {
-      const next = { ...prev, [id]: (prev[id] ?? 0) + 1 };
-      saveViews(next);
-      return next;
-    });
-  };
+  useEffect(() => {
+    const saved = localStorage.getItem(VIEWS_KEY);
+    if (saved) setLocalViews(JSON.parse(saved));
+  }, []);
 
-  // اجمع كل التقنيات من البيانات
-  const allTech: string[] = useMemo(() => {
-    const set = new Set<string>();
-    data.forEach((p) => p.tech.forEach((t) => set.add(t)));
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [data]);
+  const data = useMemo(() => {
+    const manualProjects: Project[] = [
+      {
+        id: "promanager-01",
+        title: "ProManager – MERN System",
+        summary: "Advanced project management with JWT security.",
+        description:
+          "A comprehensive solution for teams to manage tasks and track deadlines.",
+        tech: ["MongoDB", "Express", "React", "Node", "JWT"],
+        cover: promanager,
+        repoUrl: "https://github.com/hhaamed74/promanager-api.git",
+        liveUrl: "https://github.com/hhaamed74/promanager-frontend",
+        views: 120,
+        category: "fullstack",
+        createdAt: "2024-01-10T10:00:00Z",
+      },
+      {
+        id: "hamedstore-02",
+        title: "Hamed Store – E-Commerce",
+        summary: "Full-featured store with admin dashboard.",
+        description:
+          "Includes an admin panel, integrated search, and checkout flow.",
+        tech: ["React", "Node", "Redux", "MUI", "MongoDB"],
+        cover: hamedstore,
+        repoUrl: "https://github.com/hhaamed74/hamed-store",
+        liveUrl: "https://hamed-store-jt1l.vercel.app/",
+        views: 245,
+        category: "fullstack",
+        createdAt: "2024-01-05T08:30:00Z",
+      },
+    ];
+    return [...manualProjects, ...apiData];
+  }, [apiData]);
 
-  const toggleTech = (t: string) =>
-    setActiveTech((prev) =>
-      prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]
+  const filteredAndSorted = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const result = data.filter(
+      (p) =>
+        !q ||
+        [p.title, p.summary, ...p.tech].some((t) => t.toLowerCase().includes(q))
     );
 
-  const clearFilters = () => {
-    setActiveTech([]);
-    setQuery("");
-  };
-
-  // فلترة النتائج
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return data.filter((p) => {
-      const matchesQuery =
-        !q ||
-        p.title.toLowerCase().includes(q) ||
-        p.summary.toLowerCase().includes(q) ||
-        p.tech.some((t) => t.toLowerCase().includes(q));
-
-      const matchesTech =
-        activeTech.length === 0 || activeTech.every((t) => p.tech.includes(t));
-
-      return matchesQuery && matchesTech;
-    });
-  }, [data, query, activeTech]);
-
-  const sorted = useMemo(() => {
-    const enriched = filtered.map((p) => {
-      const v = views[p.id] ?? (typeof p.views === "number" ? p.views : 0); // seed من JSON لو موجود
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const d = Date.parse((p as any).createdAt ?? "") || 0;
-
-      return { p, v, d };
-    });
-
-    enriched.sort((a, b) => {
-      switch (sortBy) {
-        case "popular":
-          return b.v - a.v; // الأكثر مشاهدة
-        case "least":
-          return a.v - b.v; // الأقل مشاهدة
-        case "oldest":
-          return a.d - b.d; // الأقدم
-        case "newest":
-        default:
-          return b.d - a.d; // الأحدث
+    return result.sort((a, b) => {
+      if (sortBy === "popular") {
+        const vA = (a.views || 0) + (localViews[a.id] || 0);
+        const vB = (b.views || 0) + (localViews[b.id] || 0);
+        return vB - vA;
       }
+      const dA = new Date(a.createdAt).getTime();
+      const dB = new Date(b.createdAt).getTime();
+      return sortBy === "oldest" ? dA - dB : dB - dA;
     });
+  }, [data, query, sortBy, localViews]);
 
-    return enriched.map((x) => x.p);
-  }, [filtered, views, sortBy]);
+  const preconnectToLink = useCallback((url?: string) => {
+    if (!url) return;
+    try {
+      const link = document.createElement("link");
+      link.rel = "preconnect";
+      link.href = new URL(url).origin;
+      document.head.appendChild(link);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   const openModal = (p: Project) => {
     setSelected(p);
     setOpen(true);
-    bumpView(p.id); //  زد المشاهدات عند فتح المعاينة
+    const updated = { ...localViews, [p.id]: (localViews[p.id] || 0) + 1 };
+    setLocalViews(updated);
+    localStorage.setItem(VIEWS_KEY, JSON.stringify(updated));
   };
-  const closeModal = () => {
-    setOpen(false);
-    setSelected(null);
-  };
-
-  const selectedViews = selected
-    ? views[selected.id] ?? selected.views ?? 0
-    : 0;
 
   return (
-    <Container sx={{ py: 6 }}>
-      <Stack spacing={2} sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={700}>
-          Projects
-        </Typography>
-
-        {/* Error */}
-        {error && (
-          <Alert
-            severity="error"
-            action={
-              <Button color="inherit" size="small" onClick={refetch}>
-                Retry
-              </Button>
-            }
-          >
-            {error}
-          </Alert>
-        )}
-
-        {/* Search */}
-        <TextField
-          placeholder="Search by title, tech stack…"
-          value={query}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setQuery(e.target.value)
-          }
-          fullWidth
-        />
-
-        {/* Sort + Filters */}
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          alignItems={{ xs: "stretch", sm: "center" }}
-          justifyContent="space-between"
+    <Container
+      maxWidth="lg"
+      sx={{
+        py: 8, // زيادة الـ Padding الرأسي
+        pb: 12, // ضمان مسافة تحت الكروت
+        minHeight: "100vh",
+      }}
+    >
+      <Stack spacing={2} sx={{ mb: 6 }}>
+        <Typography
+          variant="h3"
+          fontWeight={900}
+          sx={{ fontSize: { xs: "2rem", md: "3rem" } }}
         >
-          {/* Tech Filters */}
-          <Box sx={{ flex: 1 }}>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {allTech.map((t) => {
-                const active = activeTech.includes(t);
-                return (
-                  <Chip
-                    key={t}
-                    label={t}
-                    variant={active ? "filled" : "outlined"}
-                    color={active ? "primary" : "default"}
-                    onClick={() => toggleTech(t)}
-                    sx={getTechChipSx(t)}
-                  />
-                );
-              })}
-              {allTech.length > 0 && (
-                <Tooltip title="Clear filters">
-                  <IconButton onClick={clearFilters} sx={{ ml: 1 }}>
-                    <FilterAltOffIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </Stack>
-          </Box>
-
-          {/* Sort by */}
-          <FormControl size="small" sx={{ minWidth: 190 }}>
-            <InputLabel id="sort-by-label">Sort by</InputLabel>
-            <Select
-              labelId="sort-by-label"
-              label="Sort by"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortKey)}
-            >
-              <MenuItem value="newest">Newest</MenuItem>
-              <MenuItem value="oldest">Oldest</MenuItem>
-              <MenuItem value="popular">Most Viewed</MenuItem>
-              <MenuItem value="least">Least Viewed</MenuItem>
-            </Select>
-          </FormControl>
-        </Stack>
+          Portfolio Projects
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Explore my latest full-stack applications.
+        </Typography>
       </Stack>
 
-      {/* Loading Skeletons */}
-      {loading ? (
-        <Box
-          sx={{
-            display: "grid",
-            gap: 2,
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-            },
-          }}
+      {error && (
+        <Alert
+          severity="error"
+          sx={{ mb: 4 }}
+          action={
+            <Button color="inherit" onClick={refetch}>
+              Retry
+            </Button>
+          }
         >
-          {[...Array(6)].map((_, i) => (
-            <Box key={i}>
-              <Skeleton
-                variant="rectangular"
-                height={180}
-                sx={{ borderRadius: 2, mb: 1 }}
-              />
-              <Skeleton variant="text" height={28} />
-              <Skeleton variant="text" height={22} width="80%" />
-              <Skeleton variant="text" height={22} width="60%" />
-            </Box>
-          ))}
-        </Box>
-      ) : (
-        <>
-          {/* Grid (Box + CSS Grid) */}
-          <Box
-            sx={{
-              display: "grid",
-              gap: 2,
-              gridTemplateColumns: {
-                xs: "1fr",
-                sm: "repeat(2, 1fr)",
-                md: "repeat(3, 1fr)",
-              },
-            }}
+          {error}
+        </Alert>
+      )}
+
+      {/* Filter Bar */}
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 6 }}>
+        <TextField
+          placeholder="Search tech..."
+          fullWidth
+          size="small"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          InputProps={{
+            endAdornment: query && (
+              <IconButton
+                size="small"
+                onClick={() => setQuery("")}
+                color="error"
+              >
+                <FilterAltOffIcon fontSize="small" />
+              </IconButton>
+            ),
+          }}
+        />
+        <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 180 } }}>
+          <InputLabel>Sort By</InputLabel>
+          <Select
+            value={sortBy}
+            label="Sort By"
+            onChange={(e) => setSortBy(e.target.value as SortKey)}
           >
-            {sorted.map((p) => (
-              <Box key={p.id}>
+            <MenuItem value="newest">Newest</MenuItem>
+            <MenuItem value="popular">Popular</MenuItem>
+            <MenuItem value="oldest">Oldest</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
+
+      {/* Grid - تم حل مشكلة الـ Scrollbar هنا */}
+      <Box
+        sx={{
+          display: "grid",
+          gap: 3,
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
+          },
+          width: "100%",
+        }}
+      >
+        {loading
+          ? [...Array(6)].map((_, i) => (
+              <Skeleton
+                key={i}
+                variant="rectangular"
+                height={280}
+                sx={{ borderRadius: 2 }}
+              />
+            ))
+          : filteredAndSorted.map((p) => (
+              <Box
+                key={p.id}
+                onMouseEnter={() => preconnectToLink(p.liveUrl)}
+                sx={{
+                  transition: "transform 0.3s ease",
+                  "&:hover": { transform: "translateY(-8px)" },
+                }}
+              >
                 <ProjectCard project={p} onOpen={openModal} />
               </Box>
             ))}
+      </Box>
 
-            {!error && sorted.length === 0 && (
-              <Box sx={{ gridColumn: "1 / -1" }}>
-                <Typography sx={{ opacity: 0.7 }}>
-                  No projects match your search/filters.
-                </Typography>
-              </Box>
-            )}
-          </Box>
-
-          {/* Modal Preview */}
-          <Dialog open={open} onClose={closeModal} maxWidth="md" fullWidth>
-            {selected && (
-              <>
-                <DialogTitle>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    gap={2}
+      {/* Detail Modal */}
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        {selected && (
+          <>
+            <DialogTitle
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h6" fontWeight={800}>
+                {selected.title}
+              </Typography>
+              <Box>
+                {selected.repoUrl && (
+                  <IconButton
+                    size="small"
+                    href={selected.repoUrl}
+                    target="_blank"
                   >
-                    <Typography variant="h6" fontWeight={700}>
-                      {selected.title}
-                    </Typography>
-                    <Stack direction="row" spacing={1}>
-                      {selected.repoUrl && (
-                        <Tooltip title="View Repository">
-                          <IconButton
-                            component="a"
-                            href={selected.repoUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <GitHubIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {selected.liveUrl && (
-                        <Tooltip title="Open Live">
-                          <IconButton
-                            component="a"
-                            href={selected.liveUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <OpenInNewIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </Stack>
-                  </Stack>
-                </DialogTitle>
-
-                <DialogContent dividers>
-                  {/* Meta صغيرة: تاريخ + مشاهدات */}
-                  <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                    {selected.createdAt
-                      ? `Published: ${new Date(
-                          selected.createdAt
-                        ).toLocaleDateString()} • `
-                      : ""}
-                    Views: {selectedViews}
+                    <GitHubIcon />
+                  </IconButton>
+                )}
+                {selected.liveUrl && (
+                  <IconButton
+                    size="small"
+                    href={selected.liveUrl}
+                    target="_blank"
+                    color="primary"
+                  >
+                    <OpenInNewIcon />
+                  </IconButton>
+                )}
+              </Box>
+            </DialogTitle>
+            <DialogContent dividers>
+              <Box
+                component="img"
+                src={selected.cover}
+                sx={{
+                  width: "100%",
+                  height: 220,
+                  objectFit: "cover",
+                  borderRadius: 2,
+                  mb: 2,
+                }}
+              />
+              <Stack spacing={2}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <TrendingUpIcon color="primary" fontSize="small" />
+                  <Typography variant="caption">
+                    Views:{" "}
+                    {(selected.views || 0) + (localViews[selected.id] || 0)}
                   </Typography>
-
-                  <Box
-                    component="img"
-                    src={selected.cover}
-                    alt={selected.title}
-                    sx={{
-                      width: "100%",
-                      maxHeight: 360,
-                      objectFit: "cover",
-                      borderRadius: 2,
-                      mt: 1,
-                      mb: 2,
-                    }}
+                  <Chip
+                    label={selected.category?.toUpperCase() || "WEB"}
+                    size="small"
+                    color="secondary"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: "0.6rem" }}
                   />
-
-                  <Typography sx={{ mb: 2 }}>{selected.summary}</Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    {selected.tech.map((t) => (
-                      <Chip key={t} label={t} />
-                    ))}
-                  </Stack>
-                </DialogContent>
-
-                <DialogActions>
-                  {selected.repoUrl && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<GitHubIcon />}
-                      component="a"
-                      href={selected.repoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Repository
-                    </Button>
-                  )}
-                  {selected.liveUrl && (
-                    <Button
-                      variant="contained"
-                      startIcon={<OpenInNewIcon />}
-                      component="a"
-                      href={selected.liveUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Live Demo
-                    </Button>
-                  )}
-                  <Button onClick={closeModal}>Close</Button>
-                </DialogActions>
-              </>
-            )}
-          </Dialog>
-        </>
-      )}
+                </Stack>
+                <Typography variant="body2">
+                  {selected.description || selected.summary}
+                </Typography>
+                <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                  {selected.tech.map((t) => (
+                    <Chip
+                      key={t}
+                      label={t}
+                      size="small"
+                      sx={{ fontSize: "0.7rem" }}
+                    />
+                  ))}
+                </Stack>
+              </Stack>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpen(false)}>Close</Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </Container>
   );
 }

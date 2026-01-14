@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import {
   GitHub as GitHubIcon,
-  LinkedIn as LinkedInIcon,
   Email as EmailIcon,
   Download as DownloadIcon,
   ArrowUpward as ArrowUpwardIcon,
@@ -37,7 +36,7 @@ export default function Footer() {
       setCopied(true);
       setTimeout(() => setCopied(false), 1200);
     } catch {
-      // optional fallback
+      // fallback
     }
   };
 
@@ -72,7 +71,11 @@ export default function Footer() {
           <Box>
             <Stack spacing={1}>
               <Typography variant="h6" fontWeight={800} letterSpacing={1}>
-                Hamed
+                HAMED
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.7, maxWidth: 250 }}>
+                Full-Stack Developer & Technical Instructor providing
+                high-quality digital solutions.
               </Typography>
 
               <Stack
@@ -89,18 +92,6 @@ export default function Footer() {
                     aria-label="GitHub"
                   >
                     <GitHubIcon />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="LinkedIn">
-                  <IconButton
-                    component="a"
-                    href="https://www.linkedin.com/in/hamedabdulmohsen"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="LinkedIn"
-                  >
-                    <LinkedInIcon />
                   </IconButton>
                 </Tooltip>
 
@@ -131,7 +122,7 @@ export default function Footer() {
                 <Tooltip title="Gmail">
                   <IconButton
                     component="a"
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=hamedabdulmohsenalsayed@gmail.com&su=Hello%20Hamed"
+                    href={`mailto:${email}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Gmail"
@@ -148,7 +139,7 @@ export default function Footer() {
                 variant="contained"
                 size="small"
                 startIcon={<DownloadIcon />}
-                sx={{ mt: 2, width: "fit-content" }}
+                sx={{ mt: 2, width: "fit-content", borderRadius: 2 }}
               >
                 Download CV
               </Button>
@@ -158,127 +149,98 @@ export default function Footer() {
           {/* Quick Links */}
           <Box>
             <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-              Quick Links
+              Navigation
             </Typography>
             <Stack spacing={0.5}>
-              <MUILink
-                component={RouterLink}
-                to="/"
-                underline="hover"
-                color="inherit"
-              >
-                Home
-              </MUILink>
-              <MUILink
-                component={RouterLink}
-                to="/projects"
-                underline="hover"
-                color="inherit"
-              >
-                Projects
-              </MUILink>
-              <MUILink
-                component={RouterLink}
-                to="/features"
-                underline="hover"
-                color="inherit"
-              >
-                Features
-              </MUILink>
-              <MUILink
-                component={RouterLink}
-                to="/login"
-                underline="hover"
-                color="inherit"
-              >
-                Login
-              </MUILink>
-              <MUILink
-                component={RouterLink}
-                to="/register"
-                underline="hover"
-                color="inherit"
-              >
-                Register
-              </MUILink>
+              {["Home", "Projects", "Features", "Login", "Register"].map(
+                (item) => (
+                  <MUILink
+                    key={item}
+                    component={RouterLink}
+                    to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                    underline="hover"
+                    color="inherit"
+                    sx={{ opacity: 0.8, fontSize: "0.9rem" }}
+                  >
+                    {item}
+                  </MUILink>
+                )
+              )}
             </Stack>
           </Box>
 
-          {/* Contact */}
+          {/* Contact Details */}
           <Box>
             <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-              Contact
+              Contact Info
             </Typography>
-            <Stack spacing={0.5}>
+            <Stack spacing={1.5}>
               <Stack direction="row" spacing={1} alignItems="center">
-                <LocationOnIcon fontSize="small" />
-                <Typography variant="body2">Alexandria, Egypt</Typography>
+                <LocationOnIcon fontSize="small" color="primary" />
+                <Typography variant="body2">Riyadh, Saudi Arabia</Typography>
               </Stack>
 
               <Stack direction="row" spacing={1} alignItems="center">
-                <PhoneIcon fontSize="small" />
+                <PhoneIcon fontSize="small" color="primary" />
                 <MUILink
                   href="tel:+201067156485"
                   underline="hover"
                   color="inherit"
+                  variant="body2"
                 >
-                  +20 1067156485
+                  +966 53 137 4945
                 </MUILink>
               </Stack>
 
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} alignItems="start">
                 <Tooltip title={copied ? "Copied!" : "Copy email"}>
-                  <MUILink
-                    component="button"
-                    onClick={copyEmail}
-                    underline="hover"
-                    color="inherit"
-                    sx={{ cursor: "copy", wordBreak: "break-all" }}
-                  >
-                    {email}
-                  </MUILink>
-                </Tooltip>
-                <Tooltip title={copied ? "Copied!" : "Copy"}>
-                  <IconButton
-                    onClick={copyEmail}
-                    size="small"
-                    aria-label="Copy email"
-                  >
-                    <ContentCopyIcon fontSize="small" />
-                  </IconButton>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <EmailIcon fontSize="small" color="primary" />
+                    <MUILink
+                      component="button"
+                      onClick={copyEmail}
+                      underline="hover"
+                      color="inherit"
+                      variant="body2"
+                      sx={{
+                        cursor: "copy",
+                        textAlign: "left",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {email}
+                    </MUILink>
+                    <ContentCopyIcon sx={{ fontSize: 14, opacity: 0.5 }} />
+                  </Stack>
                 </Tooltip>
               </Stack>
             </Stack>
           </Box>
         </Box>
 
-        <Divider sx={{ my: 3 }} />
+        <Divider sx={{ my: 4 }} />
 
         {/* Bottom bar */}
         <Stack
           direction={{ xs: "column", sm: "row" }}
           alignItems="center"
           justifyContent="space-between"
-          spacing={1}
+          spacing={2}
         >
-          <Typography variant="body2" sx={{ opacity: 0.8 }}>
-            © {year} Hamed Abdel Mohsen El Sayed. All rights reserved.
+          <Typography
+            variant="body2"
+            sx={{ opacity: 0.6, textAlign: { xs: "center", sm: "left" } }}
+          >
+            © {year} Hamed Abdel Mohsen El Sayed. Built with React & MUI.
           </Typography>
 
-          <Stack direction="row" spacing={2} alignItems="center">
-            <MUILink
-              component={RouterLink}
-              to="/about"
-              underline="hover"
-              color="inherit"
-            >
-              About
-            </MUILink>
+          <Stack direction="row" spacing={3} alignItems="center">
             <MUILink
               component={RouterLink}
               to="/privacy"
               underline="hover"
               color="inherit"
+              variant="caption"
             >
               Privacy
             </MUILink>
@@ -287,14 +249,15 @@ export default function Footer() {
               to="/terms"
               underline="hover"
               color="inherit"
+              variant="caption"
             >
               Terms
             </MUILink>
-
             <IconButton
               onClick={scrollTop}
               aria-label="Back to top"
               size="small"
+              sx={{ bgcolor: "action.selected" }}
             >
               <ArrowUpwardIcon fontSize="small" />
             </IconButton>

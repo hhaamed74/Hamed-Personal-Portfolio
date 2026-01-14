@@ -1,13 +1,13 @@
+// src/components/AuthRehydrate.tsx
 import { useEffect } from "react";
 import { useAppDispatch } from "../redux/hooks";
-import { login } from "../redux/slices/authSlice";
-import { getCurrentUser } from "../services/auth";
+import { clearError } from "../redux/slices/authSlice";
 
 export default function AuthRehydrate() {
   const dispatch = useAppDispatch();
   useEffect(() => {
-    const u = getCurrentUser();
-    if (u) dispatch(login(u));
+    // يمكن استخدامه لتنظيف الأخطاء عند بداية التشغيل
+    dispatch(clearError());
   }, [dispatch]);
   return null;
 }

@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Container, Typography, Snackbar, Alert } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Snackbar,
+  Alert,
+  Box,
+  CircularProgress,
+  Fade,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../redux/hooks";
 import { logout } from "../redux/slices/authSlice";
@@ -11,36 +19,61 @@ export default function Logout() {
   const [toastOpen, setToastOpen] = useState(false);
 
   useEffect(() => {
-    // نفّذ تسجيل الخروج
+    // 1. تنفيذ تسجيل الخروج
     logoutUser();
     dispatch(logout());
 
-    // اعرض Toast وبعدين روح للهوم
+    // 2. إظهار الـ Toast
     setToastOpen(true);
-    const t = setTimeout(() => navigate("/", { replace: true }), 900);
+
+    // 3. التوجيه بعد وقت قصير (أطول قليلاً لضمان قراءة المستخدم للرسالة)
+    const t = setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 1200);
 
     return () => clearTimeout(t);
   }, [dispatch, navigate]);
 
   return (
-    <Container sx={{ py: 6 }}>
-      <Typography variant="h6" sx={{ opacity: 0.8 }}>
-        Logging out…
-      </Typography>
+    <Container
+      maxWidth="sm"
+      sx={{
+        height: "60vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Fade in={true} timeout={800}>
+        <Box sx={{ textAlign: "center" }}>
+          <CircularProgress size={50} sx={{ mb: 3, opacity: 0.7 }} />
+
+          <Typography variant="h5" fontWeight={800} gutterBottom>
+            Signing Out...
+          </Typography>
+
+          <Typography variant="body1" color="text.secondary">
+            Thank you for visiting. We’re securing your session.
+          </Typography>
+        </Box>
+      </Fade>
 
       <Snackbar
         open={toastOpen}
-        onClose={() => setToastOpen(false)}
-        autoHideDuration={1600}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
-          onClose={() => setToastOpen(false)}
-          severity="success"
+          severity="info" // خليناها info لأن الخروج مش بالضرورة "نجاح" لعملية، بل هو إجراء عادي
           variant="filled"
-          sx={{ width: "100%", borderRadius: 2, boxShadow: 3 }}
+          sx={{
+            width: "100%",
+            borderRadius: 2,
+            boxShadow: 3,
+            fontWeight: 600,
+          }}
         >
-          You have been logged out successfully.
+          You have been logged out safely.
         </Alert>
       </Snackbar>
     </Container>

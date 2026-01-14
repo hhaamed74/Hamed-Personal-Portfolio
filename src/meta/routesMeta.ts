@@ -1,43 +1,59 @@
-import { svgFaviconDataUrl } from "../utils/favicon";
+// src/meta/routesMeta.ts
 
-type Meta = { title: string; emoji: string; fav: string };
+export interface PageMeta {
+  title: string;
+  fav: string;
+}
 
-export const routesMeta: Record<string, Meta> = {
-  "/": { title: "Home", emoji: "🏠", fav: svgFaviconDataUrl("H", "#1e88e5") },
+export const defaultMeta: PageMeta = {
+  title: "Portfolio",
+  fav: "https://cdn-icons-png.flaticon.com/512/1207/1207257.png",
+};
+
+export const routesMeta: Record<string, PageMeta> = {
+  "/": {
+    title: "Home",
+    fav: "https://cdn-icons-png.flaticon.com/512/1946/1946436.png",
+  },
+  "/about": {
+    title: "About Me",
+    fav: "https://cdn-icons-png.flaticon.com/512/3220/3220315.png",
+  },
   "/projects": {
-    title: "Projects",
-    emoji: "📁",
-    fav: svgFaviconDataUrl("P", "#8e24aa"),
+    title: "My Projects",
+    fav: "https://cdn-icons-png.flaticon.com/512/1087/1087815.png",
+  },
+  "/skills": {
+    title: "Technical Skills",
+    fav: "https://cdn-icons-png.flaticon.com/512/1162/1162456.png",
+  },
+  "/contact": {
+    title: "Contact Me",
+    fav: "https://cdn-icons-png.flaticon.com/512/2099/2099199.png",
+  },
+  // ✅ الصفحات الجديدة اللي طلبتها
+  "/login": {
+    title: "Login",
+    fav: "https://cdn-icons-png.flaticon.com/512/295/295128.png",
+  },
+  "/register": {
+    title: "Create Account",
+    fav: "https://cdn-icons-png.flaticon.com/512/748/748137.png",
   },
   "/features": {
     title: "Features",
-    emoji: "✨",
-    fav: svgFaviconDataUrl("F", "#ef6c00"),
-  },
-  "/about": {
-    title: "About",
-    emoji: "👤",
-    fav: svgFaviconDataUrl("A", "#2e7d32"),
-  },
-  "/login": {
-    title: "Login",
-    emoji: "🔐",
-    fav: svgFaviconDataUrl("L", "#546e7a"),
-  },
-  "/register": {
-    title: "Register",
-    emoji: "📝",
-    fav: svgFaviconDataUrl("R", "#ad1457"),
+    fav: "https://cdn-icons-png.flaticon.com/512/1067/1067555.png",
   },
   "/logout": {
-    title: "Logout",
-    emoji: "🚪",
-    fav: svgFaviconDataUrl("O", "#6d4c41"),
+    title: "Logging Out...",
+    fav: "https://cdn-icons-png.flaticon.com/512/1828/1828479.png",
   },
-};
-
-export const defaultMeta: Meta = {
-  title: "Portfolio",
-  emoji: "💼",
-  fav: svgFaviconDataUrl("P", "#263238"),
+  "/terms": {
+    title: "Terms of Service",
+    fav: "https://cdn-icons-png.flaticon.com/512/3503/3503827.png",
+  },
+  "/privacy": {
+    title: "Privacy Policy",
+    fav: "https://cdn-icons-png.flaticon.com/512/2569/2569174.png",
+  },
 };

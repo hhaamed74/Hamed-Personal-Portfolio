@@ -19,8 +19,8 @@ It showcases projects, skills, an about page with certificates & a map, and incl
 - **About page**
   - Bio + education timeline (schools & institute)
   - Certificates (Graduation + **MCIT**) with **view & download**
-  - Embedded **Google Maps** (Alexandria address)
-- **Auth (demo)**
+- Embedded **Google Maps**: Updated to dynamic Riyadh location (supports dark mode filtering for better UI integration).
+  - Smart **Age Calculation**: Automatically updates based on DOB (Sept 15, 2002).- **Auth (demo)**
   - Register / Login / Logout (stored in `localStorage`)
   - Passwords hashed with **PBKDF2** + salt (auto-migrates legacy plaintext)
   - Protected routes: **/features**, **/privacy**, **/terms**
@@ -28,18 +28,18 @@ It showcases projects, skills, an about page with certificates & a map, and incl
 - **Footer** with social links (GitHub, LinkedIn, Facebook, WhatsApp) + **copy email**
 - **404 page** with search, back button, and quick links
 - **Small touches**: styled scrollbars, toasts, page `<title>` & favicon per route
+- **Visual Contrast & Fixes**:
+  - Fixed icon visibility in Personal Info cards by ensuring high-contrast rendering.
+  - Resolved **Double Container** issues by utilizing a flexible Box-based Layout.
+  - Fixed **Horizontal Scrolling** on mobile devices by enforcing `overflowX: "hidden"` on the main layout wrapper.
 
 > **Note:** Grids are implemented with **`<Box sx={{ display: 'grid' }}/>`** to keep the layout simple and avoid version-specific Grid APIs.
 
 ---
 
-| Home                                | Projects                                    |
-| ----------------------------------- | ------------------------------------------- |
-| ![Home](public/screenshot-home.png) | ![Projects](public/screenshot-projects.png) |
-
-| About                                 | 404                               |
-| ------------------------------------- | --------------------------------- |
-| ![About](public/screenshot-about.png) | ![404](public/screenshot-404.png) |
+| Home                     | Projects                         |
+| ------------------------ | -------------------------------- |
+| ![Home](public/Home.png) | ![Projects](public/projects.png) |
 
 ---
 
@@ -59,6 +59,8 @@ src/
     RouteProgress.tsx
   context/
     ThemeContext.tsx          # Theme + presets (Default/Rose/Grape) + persistence
+    ThemeTypes.ts
+    useThemeContext.tsx
   hooks/
     usePageMeta.ts            # Sets title / favicon
     useProjects.ts            # Fetches projects.json + refetch

@@ -7,50 +7,68 @@ import {
   Paper,
   Chip,
   Divider,
+  useTheme,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import { memo } from "react";
 
-export default function Home() {
-  const skillGroups: { title: string; items: string[] }[] = [
-    {
-      title: "Frontend",
-      items: [
-        "HTML",
-        "CSS",
-        "Sass (SCSS)",
-        "Tailwind CSS",
-        "Bootstrap",
-        "Material UI",
-      ],
-    },
-    {
-      title: "JavaScript / React",
-      items: [
-        "JavaScript (ES6+)",
-        "TypeScript",
-        "React",
-        "React Router",
-        "Redux Toolkit",
-        "Axios",
-      ],
-    },
-    { title: "Storage", items: ["Dexie (IndexedDB)", "Local Storage"] },
-    { title: "Internationalization", items: ["i18next (Multi-language)"] },
-    {
-      title: "Animations & UX",
-      items: ["Framer Motion", "Notifications System", "Dark/Light Mode"],
-    },
-    {
-      title: "Programming & Dev",
-      items: ["C# Fundamentals", "Git", "GitHub", "npm"],
-    },
-    { title: "Tools", items: ["Visual Studio", "VS Code", "Postman"] },
-    { title: "Office", items: ["Microsoft Word", "Excel", "PowerPoint"] },
-  ];
+// Move static data outside the component to prevent re-creation on every render (Performance)
+const SKILL_GROUPS = [
+  {
+    title: "Full-Stack Development",
+    items: [
+      "Node.js",
+      "Express.js",
+      "RESTful APIs",
+      "JWT Auth",
+      "JavaScript (ES6+)",
+      "TypeScript",
+    ],
+  },
+  {
+    title: "Databases & Storage",
+    items: [
+      "MongoDB",
+      "SQL (MySQL)",
+      "Oracle Database",
+      // "PostgreSQL",
+      "Redis (Basic)",
+    ],
+  },
+  {
+    title: "Frontend Mastery",
+    items: [
+      "React.js",
+      "Redux Toolkit",
+      "Material UI",
+      "Tailwind CSS",
+      "Framer Motion",
+    ],
+  },
+  {
+    title: "DevOps & Tools",
+    items: ["Git & GitHub", "Postman", "Vite", "NPM/Yarn", "Docker Concepts"],
+  },
+  {
+    title: "Architecture & Logic",
+    items: [
+      // "MVC Pattern",
+      // "Unit Testing",
+      // "Microservices Basics",
+      "Clean Architecture",
+    ],
+  },
+];
+
+const Home = () => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
 
   return (
     <Container sx={{ py: 8, position: "relative" }}>
-      {/* خلفية هادئة متوهجة */}
+      {/* Abstract Background: Using radial gradients for a modern "Glassmorphism" feel.
+          pointerEvents: "none" ensures the background doesn't intercept clicks.
+      */}
       <Box
         aria-hidden
         sx={{
@@ -58,13 +76,14 @@ export default function Home() {
           inset: 0,
           zIndex: -1,
           pointerEvents: "none",
-          background:
-            "radial-gradient(1200px 400px at 20% -10%, rgba(25,118,210,.15), transparent 60%), radial-gradient(900px 320px at 120% 10%, rgba(156,39,176,.12), transparent 60%)",
+          background: isDarkMode
+            ? "radial-gradient(1200px 400px at 20% -10%, rgba(25,118,210,.15), transparent 60%), radial-gradient(900px 320px at 120% 10%, rgba(156,39,176,.12), transparent 60%)"
+            : "radial-gradient(1200px 400px at 20% -10%, rgba(25,118,210,.05), transparent 60%)",
           filter: "blur(0.2px)",
         }}
       />
 
-      {/* العنوان الرئيسي بنص متدرّج */}
+      {/* Main Heading with Gradient Animation */}
       <Typography
         variant="h3"
         fontWeight={900}
@@ -77,60 +96,70 @@ export default function Home() {
             "linear-gradient(90deg, #42a5f5 0%, #90caf9 30%, #ce93d8 70%, #ab47bc 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
-          textShadow: "0 0 0 rgba(0,0,0,0)", // يخلّي الجليتش أنعم
           "@keyframes glow": {
             "0%,100%": { filter: "drop-shadow(0 0 0px rgba(66,165,245,0.0))" },
             "50%": { filter: "drop-shadow(0 6px 14px rgba(66,165,245,0.25))" },
           },
           animation: "glow 4s ease-in-out infinite",
+          fontSize: { xs: "2.5rem", md: "3.5rem" },
         }}
       >
-        Welcome to my Portfolio
+        Elevating Web Experiences
       </Typography>
 
-      {/* السطر التعريفي */}
+      {/* Subheading: Defined your identity as Full-Stack */}
       <Typography
         variant="h6"
-        gutterBottom
         sx={{
           opacity: 0.9,
-          fontStyle: "italic",
-          letterSpacing: "0.6px",
+          mb: 3,
           color: "text.primary",
-          fontSize: { xs: "1.05rem", sm: "1.2rem" },
-          "&:hover": { color: "primary.main", textDecoration: "underline" },
-          maxWidth: 900,
+          fontSize: { xs: "1rem", sm: "1.25rem" },
+          maxWidth: 800,
         }}
       >
-        My name is <strong>Hamed Abdel Mohsen El Sayed</strong>, and I am a
-        Front-End Developer.
+        I am <strong>Hamed Abdel Mohsen</strong>, a results-driven{" "}
+        <Box component="span" sx={{ color: "primary.main", fontWeight: 700 }}>
+          Full-Stack Developer
+        </Box>{" "}
+        specializing in building robust Backend systems with Node.js and
+        crafting high-performance Frontend interfaces.
       </Typography>
 
-      {/* CTAs */}
-      <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-        <Button component={RouterLink} to="/projects" variant="contained">
-          View Projects
+      <Stack direction="row" spacing={2}>
+        <Button
+          component={RouterLink}
+          to="/projects"
+          variant="contained"
+          size="large"
+          sx={{ px: 4 }}
+        >
+          Explore Projects
         </Button>
-        <Button component={RouterLink} to="/about" variant="outlined">
-          About Me
+        <Button
+          component={RouterLink}
+          to="/about"
+          variant="outlined"
+          size="large"
+        >
+          Technical Bio
         </Button>
       </Stack>
 
-      {/* Skills Section */}
-      <Box sx={{ mt: 6 }}>
+      {/* Skills Grid Section */}
+      <Box sx={{ mt: 10 }}>
         <Typography variant="h5" fontWeight={800} gutterBottom>
-          Skills
+          Technical Arsenal
         </Typography>
-        <Typography variant="body1" sx={{ opacity: 0.75, mb: 2 }}>
-          Technologies & tools I use day-to-day
+        <Typography variant="body1" sx={{ opacity: 0.7, mb: 4 }}>
+          A curated list of technologies I leverage to solve complex problems.
         </Typography>
-        <Divider sx={{ mb: 3 }} />
+        <Divider sx={{ mb: 4 }} />
 
-        {/* ✅ CSS Grid بدل MUI Grid لتفادي أي أخطاء */}
         <Box
           sx={{
             display: "grid",
-            gap: 16 / 8 + "rem", // 2
+            gap: 3,
             gridTemplateColumns: {
               xs: "1fr",
               sm: "repeat(2, 1fr)",
@@ -138,84 +167,59 @@ export default function Home() {
             },
           }}
         >
-          {skillGroups.map((group) => (
+          {SKILL_GROUPS.map((group) => (
             <Paper
               key={group.title}
               elevation={0}
               sx={{
-                p: 2.5,
-                borderRadius: 3,
+                p: 3,
+                borderRadius: 4,
                 border: "1px solid",
                 borderColor: "divider",
-                bgcolor: (t) =>
-                  t.palette.mode === "dark"
-                    ? "rgba(18,21,27,0.6)"
-                    : "rgba(255,255,255,0.7)",
-                backdropFilter: "blur(6px)",
-                transition:
-                  "transform .2s ease, box-shadow .2s ease, border-color .2s ease",
-                position: "relative",
-                overflow: "hidden",
-                "&::after": {
-                  content: '""',
-                  position: "absolute",
-                  inset: 0,
-                  background:
-                    "linear-gradient(120deg, rgba(66,165,245,.08), transparent 30%, rgba(171,71,188,.08))",
-                  pointerEvents: "none",
-                },
+                bgcolor: isDarkMode
+                  ? "rgba(255,255,255,0.03)"
+                  : "rgba(0,0,0,0.01)",
+                backdropFilter: "blur(12px)",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
-                  transform: "translateY(-4px)",
-                  boxShadow: (t) =>
-                    t.shadows[3] +
-                    ", 0 10px 30px rgba(66,165,245, .10), inset 0 0 0 1px rgba(255,255,255,.02)",
+                  transform: "translateY(-5px)",
                   borderColor: "primary.main",
+                  boxShadow: `0 10px 40px -10px ${theme.palette.primary.main}33`,
                 },
               }}
             >
-              <Typography variant="subtitle1" fontWeight={800} sx={{ mb: 1 }}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={800}
+                color="primary.light"
+                sx={{ mb: 2 }}
+              >
                 {group.title}
               </Typography>
-              <Stack
-                direction="row"
-                spacing={1}
-                useFlexGap
-                flexWrap="wrap"
-                sx={{
-                  "@keyframes float": {
-                    "0%,100%": { transform: "translateY(0)" },
-                    "50%": { transform: "translateY(-3px)" },
-                  },
-                  "& .skill-chip": {
-                    borderRadius: 2,
-                    transition: "all .18s ease",
-                    borderColor: "divider",
-                  },
-                  "& .skill-chip:hover": {
-                    borderColor: "primary.main",
-                    backgroundColor: (t) =>
-                      t.palette.mode === "dark"
-                        ? "rgba(66,165,245,.12)"
-                        : "rgba(66,165,245,.10)",
-                    transform: "translateY(-2px)",
-                  },
-                }}
-              >
-                {group.items.map((it, i) => (
+              <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                {group.items.map((skill, index) => (
                   <Chip
-                    key={it}
-                    label={it}
+                    key={skill}
+                    label={skill}
                     size="small"
                     variant="outlined"
-                    className="skill-chip"
                     sx={{
-                      animation: `${
-                        i % 3 === 0
-                          ? "float 4.2s"
-                          : i % 3 === 1
-                          ? "float 4.6s"
-                          : "float 4.0s"
-                      } ease-in-out infinite`,
+                      borderRadius: "6px",
+                      fontSize: "0.75rem",
+                      transition: "0.2s",
+                      /* Custom staggered floating animation for visual dynamism */
+                      animation: `float ${
+                        4 + (index % 3)
+                      }s ease-in-out infinite`,
+                      "@keyframes float": {
+                        "0%, 100%": { transform: "translateY(0)" },
+                        "50%": { transform: "translateY(-4px)" },
+                      },
+                      "&:hover": {
+                        bgcolor: "primary.main",
+                        color: "white",
+                        transform: "scale(1.1) !important",
+                      },
                     }}
                   />
                 ))}
@@ -226,4 +230,7 @@ export default function Home() {
       </Box>
     </Container>
   );
-}
+};
+
+// Use memo to prevent unnecessary re-renders if parent state changes
+export default memo(Home);

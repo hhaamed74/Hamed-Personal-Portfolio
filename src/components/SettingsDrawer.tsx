@@ -8,157 +8,151 @@ import {
   Switch,
   Typography,
   Divider,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
   Paper,
+  useTheme,
+  alpha,
+  Zoom,
 } from "@mui/material";
 import {
   Settings as SettingsIcon,
   Close as CloseIcon,
-  DarkMode as DarkModeIcon,
-  LightMode as LightModeIcon,
-  ColorLens as ColorLensIcon,
+  Palette as PaletteIcon,
 } from "@mui/icons-material";
-import { useThemeContext } from "../context/ThemeContext";
+import { useThemeContext } from "../context/useThemeContext"; // ✅ استيراد صحيح
+import { PRESETS_DATA } from "../context/ThemeTypes"; // ✅ استيراد صحيح
 
 export default function SettingsDrawer() {
   const { mode, toggleColorMode, preset, setPreset } = useThemeContext();
   const [open, setOpen] = useState(false);
+  const theme = useTheme();
 
   return (
     <>
-      {/* زرار عائم على الجنب */}
-      <Tooltip title="Settings">
+      <Tooltip title="Customize Theme" TransitionComponent={Zoom} arrow>
         <IconButton
           onClick={() => setOpen(true)}
-          size="large"
           sx={{
             position: "fixed",
-            left: 18,
-            bottom: 50,
+            left: 20,
+            bottom: 30,
             zIndex: (t) => t.zIndex.drawer + 1,
-            bgcolor: "background.paper",
-            border: 1,
+            bgcolor: alpha(theme.palette.background.paper, 0.8),
+            backdropFilter: "blur(8px)",
+            border: "1px solid",
             borderColor: "divider",
-            boxShadow: 2,
-            "&:hover": { bgcolor: "background.paper" },
+            color: "primary.main",
+            "&:hover": {
+              transform: "rotate(90deg) scale(1.1)",
+              bgcolor: "primary.main",
+              color: "#fff",
+            },
+            transition: "all 0.3s",
           }}
-          aria-label="Open settings"
         >
           <SettingsIcon />
         </IconButton>
       </Tooltip>
 
-      <Drawer anchor="left" open={open} onClose={() => setOpen(false)}>
-        <Box sx={{ width: { xs: 300, sm: 340 }, p: 2 }}>
+      <Drawer
+        anchor="left"
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          sx: {
+            width: 300,
+            bgcolor: alpha(theme.palette.background.default, 0.9),
+            backdropFilter: "blur(12px)",
+          },
+        }}
+      >
+        <Box sx={{ p: 3 }}>
           <Stack
             direction="row"
             alignItems="center"
             justifyContent="space-between"
-            sx={{ mb: 1 }}
+            sx={{ mb: 3 }}
           >
-            <Typography variant="h6" fontWeight={800}>
-              Settings
-            </Typography>
-            <IconButton
-              onClick={() => setOpen(false)}
-              aria-label="Close settings"
-            >
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <PaletteIcon color="primary" />
+              <Typography variant="h6" fontWeight={900}>
+                Configuration
+              </Typography>
+            </Stack>
+            <IconButton onClick={() => setOpen(false)} size="small">
               <CloseIcon />
             </IconButton>
           </Stack>
 
-          <Divider sx={{ mb: 2 }} />
+          <Divider sx={{ mb: 3 }} />
 
-          {/* Theme Mode */}
-          <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ mb: 2, fontWeight: 800, opacity: 0.6 }}
+          >
+            APPEARANCE
+          </Typography>
+          <Paper
+            variant="outlined"
+            sx={{ p: 2, mb: 4, borderRadius: 3, bgcolor: "transparent" }}
+          >
             <Stack
               direction="row"
-              alignItems="center"
-              spacing={1}
-              sx={{ mb: 1 }}
-            >
-              {mode === "dark" ? (
-                <DarkModeIcon fontSize="small" />
-              ) : (
-                <LightModeIcon fontSize="small" />
-              )}
-              <Typography fontWeight={700}>Theme Mode</Typography>
-            </Stack>
-            <Stack
-              direction="row"
-              alignItems="center"
               justifyContent="space-between"
-            >
-              <Typography sx={{ opacity: 0.8 }}>
-                {mode === "dark" ? "Dark" : "Light"}
-              </Typography>
-              <Switch
-                checked={mode === "dark"}
-                onChange={toggleColorMode}
-                inputProps={{ "aria-label": "Toggle dark mode" }}
-              />
-            </Stack>
-          </Paper>
-
-          {/* Presets */}
-          <Paper variant="outlined" sx={{ p: 2 }}>
-            <Stack
-              direction="row"
               alignItems="center"
-              spacing={1}
-              sx={{ mb: 1 }}
             >
-              <ColorLensIcon fontSize="small" />
-              <Typography fontWeight={700}>Theme Preset</Typography>
+              <Typography fontWeight={700}>
+                {mode === "dark" ? "Dark Mode" : "Light Mode"}
+              </Typography>
+              <Switch checked={mode === "dark"} onChange={toggleColorMode} />
             </Stack>
-
-            <ToggleButtonGroup
-              value={preset}
-              exclusive
-              onChange={(_, v) => v && setPreset(v)}
-              fullWidth
-              color="primary"
-            >
-              <ToggleButton value="default">
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    bgcolor: "#1e88e5",
-                    borderRadius: "50%",
-                    mr: 1,
-                  }}
-                />
-                Default
-              </ToggleButton>
-              <ToggleButton value="rose">
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    bgcolor: "#e91e63",
-                    borderRadius: "50%",
-                    mr: 1,
-                  }}
-                />
-                Rose
-              </ToggleButton>
-              <ToggleButton value="grape">
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    bgcolor: "#7c4dff",
-                    borderRadius: "50%",
-                    mr: 1,
-                  }}
-                />
-                Grape
-              </ToggleButton>
-            </ToggleButtonGroup>
           </Paper>
+
+          <Typography
+            variant="subtitle2"
+            sx={{ mb: 2, fontWeight: 800, opacity: 0.6 }}
+          >
+            COLOR PALETTES
+          </Typography>
+          <Stack spacing={1.5}>
+            {PRESETS_DATA.map((p) => (
+              <Box
+                key={p.name}
+                onClick={() => setPreset(p.name)}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 3,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  border: "2px solid",
+                  transition: "0.2s",
+                  borderColor: preset === p.name ? p.color : "transparent",
+                  bgcolor:
+                    preset === p.name
+                      ? alpha(p.color, 0.1)
+                      : alpha(theme.palette.divider, 0.05),
+                  "&:hover": { bgcolor: alpha(p.color, 0.15) },
+                }}
+              >
+                <Stack direction="row" alignItems="center" spacing={2}>
+                  <Box
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      bgcolor: p.color,
+                      borderRadius: "50%",
+                      boxShadow: `0 0 10px ${alpha(p.color, 0.5)}`,
+                    }}
+                  />
+                  <Typography fontWeight={preset === p.name ? 800 : 600}>
+                    {p.label}
+                  </Typography>
+                </Stack>
+              </Box>
+            ))}
+          </Stack>
         </Box>
       </Drawer>
     </>

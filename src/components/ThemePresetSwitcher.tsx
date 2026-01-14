@@ -5,11 +5,11 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from "@mui/material";
-import { useThemeContext } from "../context/ThemeContext";
+import { useThemeContext } from "../context/useThemeContext";
 
-type Preset = "default" | "rose" | "grape";
+// ✅ أضفنا emerald هنا في الـ Type
+type Preset = "default" | "rose" | "grape" | "emerald";
 
-// ألوان المعاينة (light mode) — بس للعرض داخل الزر
 const SWATCH: Record<
   Preset,
   { primary: string; secondary: string; label: string }
@@ -17,6 +17,8 @@ const SWATCH: Record<
   default: { primary: "#1e88e5", secondary: "#9c27b0", label: "Default" },
   rose: { primary: "#e91e63", secondary: "#f06292", label: "Rose" },
   grape: { primary: "#7e57c2", secondary: "#8e24aa", label: "Grape" },
+  // ✅ أضفنا Emerald هنا عشان الزراير تظهر
+  emerald: { primary: "#10b981", secondary: "#059669", label: "Emerald" },
 };
 
 function ColorSwatch({ p, s }: { p: string; s: string }) {
@@ -54,13 +56,15 @@ export default function ThemePresetSwitcher() {
       exclusive
       onChange={(_, v) => v && setPreset(v)}
       aria-label="Theme preset"
+      sx={{ bgcolor: "background.paper" }}
     >
       {(Object.keys(SWATCH) as Preset[]).map((key) => (
         <ToggleButton key={key} value={key} aria-label={SWATCH[key].label}>
           <Tooltip title={SWATCH[key].label}>
-            <span>
+            {/* Box لضمان عمل الـ Tooltip حتى لو الـ Button Disabled */}
+            <Box component="span">
               <ColorSwatch p={SWATCH[key].primary} s={SWATCH[key].secondary} />
-            </span>
+            </Box>
           </Tooltip>
         </ToggleButton>
       ))}

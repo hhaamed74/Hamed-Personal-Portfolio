@@ -23,7 +23,7 @@ import { Link as RouterLink } from "react-router-dom";
 
 // Components & Assets
 import FeatureCard from "../components/FeatureCard";
-import cvFile from "../assets/Hamed_AbdelMohsen.pdf";
+import cvFile from "../assets/Hamed_AbdelMohsen_FullStack_MERN.pdf";
 
 /**
  * Features Component - Clean Full-Stack Edition

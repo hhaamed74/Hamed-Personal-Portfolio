@@ -14,7 +14,6 @@ import {
   GitHub as GitHubIcon,
   Email as EmailIcon,
   Download as DownloadIcon,
-  ArrowUpward as ArrowUpwardIcon,
   LocationOn as LocationOnIcon,
   Phone as PhoneIcon,
   Facebook as FacebookIcon,
@@ -39,8 +38,6 @@ export default function Footer() {
       // fallback
     }
   };
-
-  const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
     <Box
@@ -253,14 +250,6 @@ export default function Footer() {
             >
               Terms
             </MUILink>
-            <IconButton
-              onClick={scrollTop}
-              aria-label="Back to top"
-              size="small"
-              sx={{ bgcolor: "action.selected" }}
-            >
-              <ArrowUpwardIcon fontSize="small" />
-            </IconButton>
           </Stack>
         </Stack>
       </Container>

@@ -17,18 +17,19 @@ import Footer from "./components/Footer";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+
+// Services & Components
 import AuthRehydrate from "./services/AuthRehydrate";
 import SettingsDrawer from "./components/SettingsDrawer";
-
-// Components
 import RouteProgress from "./components/RouteProgress";
+import ScrollToTop from "./components/ScrollToTop"; // المكون الجديد
 
 /**
  * الـ Layout الأساسي للموقع
- * تم استبدال Container بـ Box لمنع تداخل الحاويات (Double Containers)
- * ولضمان أن كل صفحة تتحكم في الـ Padding الخاص بها بشكل كامل
+ * يضمن توزيع العناصر بشكل رأسي متناسق (Navbar -> Content -> Footer)
  */
 function Layout() {
+  // تعيين العنوان الافتراضي للموقع
   usePageMeta("Hamed | Portfolio");
 
   return (
@@ -37,17 +38,31 @@ function Layout() {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        overflowX: "hidden", // لضمان عدم حدوث Scroll عرضي نهائياً
+        overflowX: "hidden", // منع حدوث سكرول عرضي بسبب الأنيميشن أو الصور
       }}
     >
+      {/* شريط التنقل العلوي */}
       <Navbar />
 
-      {/* منطقة محتوى الصفحات */}
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      {/* منطقة عرض المحتوى (الصفحات) */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Outlet />
       </Box>
 
+      {/* زر العودة للأعلى - سيتغير لونه تلقائياً مع الثيم */}
+      <ScrollToTop />
+
+      {/* درج الإعدادات (تغيير الألوان والمود) */}
       <SettingsDrawer />
+
+      {/* التذييل السفلي */}
       <Footer />
     </Box>
   );
@@ -56,20 +71,20 @@ function Layout() {
 export default function App() {
   return (
     <AppThemeProvider>
-      {/* إعادة تهيئة حالة تسجيل الدخول */}
+      {/* استعادة جلسة المستخدم عند فتح الموقع */}
       <AuthRehydrate />
 
-      {/* شريط التقدّم الخاص بالتنقّل بين الصفحات */}
+      {/* شريط التقدّم النحيف أعلى الصفحة عند الانتقال */}
       <RouteProgress />
 
       <Routes>
         <Route element={<Layout />}>
-          {/* صفحات عامة */}
+          {/* --- المسارات العامة --- */}
           <Route index element={<Home />} />
           <Route path="projects" element={<Projects />} />
           <Route path="about" element={<About />} />
 
-          {/* صفحات تتطلب تسجيل دخول */}
+          {/* --- المسارات المحمية (تطلب تسجيل دخول) --- */}
           <Route
             path="features"
             element={
@@ -97,12 +112,12 @@ export default function App() {
             }
           />
 
-          {/* صفحات الحساب */}
+          {/* --- مسارات الحساب --- */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="logout" element={<Logout />} />
 
-          {/* صفحة الخطأ 404 */}
+          {/* --- صفحة الخطأ --- */}
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

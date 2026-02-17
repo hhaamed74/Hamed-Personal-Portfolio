@@ -241,6 +241,7 @@ export default function Navbar() {
             { text: "Home", icon: <HomeIcon />, path: "/" },
             { text: "Projects", icon: <ProjectsIcon />, path: "/projects" },
             { text: "Features", icon: <FeaturesIcon />, path: "/features" },
+            { text: "Services", icon: <FeaturesIcon />, path: "/services" },
             { text: "About", icon: <AboutIcon />, path: "/about" },
           ].map((item) => (
             <ListItemButton

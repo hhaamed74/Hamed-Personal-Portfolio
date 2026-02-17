@@ -33,7 +33,7 @@ import {
 
 import { useAppSelector } from "../redux/hooks";
 import { useThemeContext } from "../context/useThemeContext";
-import cvFile from "../assets/Hamed_AbdelMohsen_FullStack_MERN.pdf";
+import cvFile from "../assets/Hamed_AbdelMohsen_FullStack.pdf";
 
 export default function Navbar() {
   const { isAuthenticated, user } = useAppSelector((s) => s.auth);
@@ -121,6 +121,7 @@ export default function Navbar() {
                 { name: "Home", path: "/" },
                 { name: "Projects", path: "/projects" },
                 { name: "Features", path: "/features" },
+                { name: "Services", path: "/services" },
                 { name: "About", path: "/about" },
               ].map((link) => (
                 <Button

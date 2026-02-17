@@ -21,7 +21,7 @@ import {
   ContentCopy as ContentCopyIcon,
 } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
-import cvFile from "../assets/Hamed_AbdelMohsen_FullStack_MERN.pdf";
+import cvFile from "../assets/Hamed_AbdelMohsen_FullStack.pdf";
 
 const year = new Date().getFullYear();
 
@@ -161,7 +161,7 @@ export default function Footer() {
                   >
                     {item}
                   </MUILink>
-                )
+                ),
               )}
             </Stack>
           </Box>

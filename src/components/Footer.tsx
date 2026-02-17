@@ -149,7 +149,7 @@ export default function Footer() {
               Navigation
             </Typography>
             <Stack spacing={0.5}>
-              {["Home", "Projects", "Features", "Login", "Register"].map(
+              {["Home", "Projects", "Features","Services", "Login", "Register"].map(
                 (item) => (
                   <MUILink
                     key={item}

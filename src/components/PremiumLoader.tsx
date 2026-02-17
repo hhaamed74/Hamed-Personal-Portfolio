@@ -11,7 +11,6 @@ const MatrixLoader: React.FC<MatrixLoaderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [progress, setProgress] = useState<number>(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const theme = useTheme();
 
   // مصفوفة الألوان المطلوبة (Sky, Rose, Grape, Emerald)
   const colors = ["#0ea5e9", "#f43f5e", "#8b5cf6", "#10b981"];
@@ -216,3 +215,4 @@ const MatrixLoader: React.FC<MatrixLoaderProps> = ({ children }) => {
 import { Stack } from "@mui/material";
 
 export default React.memo(MatrixLoader);
+

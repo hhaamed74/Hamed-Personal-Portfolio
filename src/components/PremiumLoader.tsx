@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography} from "@mui/material";
 
 interface MatrixLoaderProps {
   children: React.ReactNode;
@@ -215,4 +215,5 @@ const MatrixLoader: React.FC<MatrixLoaderProps> = ({ children }) => {
 import { Stack } from "@mui/material";
 
 export default React.memo(MatrixLoader);
+
 

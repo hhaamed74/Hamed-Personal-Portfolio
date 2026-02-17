@@ -37,7 +37,7 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 
 // Assets
-import cvFile from "../assets/Hamed_AbdelMohsen_FullStack_MERN.pdf";
+import cvFile from "../assets/Hamed_AbdelMohsen_FullStack.pdf";
 import mcitCert from "../assets/mcit_certificate.png";
 import gradCert from "../assets/graduation_certificate.jpg";
 

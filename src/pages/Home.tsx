@@ -15,48 +15,42 @@ import { memo } from "react";
 // Move static data outside the component to prevent re-creation on every render (Performance)
 const SKILL_GROUPS = [
   {
-    title: "Full-Stack Development",
+    title: "Frontend Mastery",
+    items: [
+      "React.js (18)",
+      "JavaScript (ES6+)",
+      "TypeScript",
+      "HTML5 & CSS3",
+      "Sass",
+      "Tailwind CSS",
+      "shadcn/ui",
+      "Material UI",
+      "Bootstrap",
+    ],
+  },
+  {
+    title: "Backend Excellence",
     items: [
       "Node.js",
       "Express.js",
+      "PHP",
+      "Laravel",
       "RESTful APIs",
-      "JWT Auth",
-      "JavaScript (ES6+)",
-      "TypeScript",
+      "JWT Authentication",
+      "RBAC",
     ],
   },
   {
     title: "Databases & Storage",
-    items: [
-      "MongoDB",
-      "SQL (MySQL)",
-      "Oracle Database",
-      // "PostgreSQL",
-      "Redis (Basic)",
-    ],
-  },
-  {
-    title: "Frontend Mastery",
-    items: [
-      "React.js",
-      "Redux Toolkit",
-      "Material UI",
-      "Tailwind CSS",
-      "Framer Motion",
-    ],
+    items: ["MongoDB", "Mongoose", "MongoDB Atlas", "MySQL", "PostgreSQL"],
   },
   {
     title: "DevOps & Tools",
-    items: ["Git & GitHub", "Postman", "Vite", "NPM/Yarn", "Docker Concepts"],
+    items: ["Git & GitHub", "Postman", "Vite", "npm"],
   },
   {
-    title: "Architecture & Logic",
-    items: [
-      // "MVC Pattern",
-      // "Unit Testing",
-      // "Microservices Basics",
-      "Clean Architecture",
-    ],
+    title: "Architecture",
+    items: ["Clean Architecture", "Full-Stack Solutions"],
   },
 ];
 
@@ -122,8 +116,8 @@ const Home = () => {
         <Box component="span" sx={{ color: "primary.main", fontWeight: 700 }}>
           Full-Stack Developer
         </Box>{" "}
-        specializing in building robust Backend systems with Node.js and
-        crafting high-performance Frontend interfaces.
+        dedicated to building complete, production-ready websites—from
+        eye-catching interfaces to powerful servers and databases."
       </Typography>
 
       <Stack direction="row" spacing={2}>

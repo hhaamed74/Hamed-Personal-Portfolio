@@ -23,11 +23,11 @@ import { Link as RouterLink } from "react-router-dom";
 
 // Components & Assets
 import FeatureCard from "../components/FeatureCard";
-import cvFile from "../assets/Hamed_AbdelMohsen_FullStack_MERN.pdf";
+import cvFile from "../assets/Hamed_AbdelMohsen_FullStack.pdf";
 
 /**
  * Features Component - Clean Full-Stack Edition
- * تم ضبط الأيقونات لتظهر بوضوح وبحجم مناسب بدون تكرار الخلفيات.
+ * تم تحديث المهارات لتشمل PHP, Laravel, shadcn/ui وكافة التقنيات المذكورة.
  */
 export default function Features() {
   const theme = useTheme();
@@ -40,7 +40,7 @@ export default function Features() {
       {/* --- Header Section --- */}
       <Stack spacing={1} sx={{ mb: 6 }}>
         <Typography variant="h3" fontWeight={900} gutterBottom color="primary">
-          Features & Services
+          Features
         </Typography>
         <Typography variant="h6" sx={{ opacity: 0.8, maxWidth: "800px" }}>
           Providing end-to-end digital solutions, from scalable{" "}
@@ -74,14 +74,15 @@ export default function Features() {
         <FeatureCard
           icon={<CodeIcon sx={{ fontSize: iconSize }} color="primary" />}
           title="Front-End Development"
-          subtitle="React • TypeScript • MUI"
+          subtitle="React • TypeScript • Tailwind"
           description="Crafting high-performance, responsive SPAs with focus on UX, reusable components, and modern state management."
           skills={[
-            "React.js",
+            "React.js (18)",
             "TypeScript",
-            "Redux Toolkit",
+            "Tailwind CSS",
+            "shadcn/ui",
             "Material UI",
-            "Vite",
+            "Redux Toolkit",
           ]}
         />
 
@@ -89,14 +90,16 @@ export default function Features() {
         <FeatureCard
           icon={<StorageIcon sx={{ fontSize: iconSize }} color="primary" />}
           title="Back-End & Database"
-          subtitle="Node.js • Express • PostgreSQL"
+          subtitle="Node.js • Laravel • PostgreSQL"
           description="Building secure RESTful APIs, managing relational databases, and server-side logic optimization."
           skills={[
             "Node.js",
-            "Express",
+            "Express.js",
+            "PHP",
+            "Laravel",
+            "MySQL",
             "PostgreSQL",
-            "JWT",
-            "Prisma/Sequelize",
+            "JWT / RBAC",
           ]}
         />
       </Box>

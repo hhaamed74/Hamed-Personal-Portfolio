@@ -44,6 +44,10 @@ export const routesMeta: Record<string, PageMeta> = {
     title: "Features",
     fav: "https://cdn-icons-png.flaticon.com/512/1067/1067555.png",
   },
+  "/services": {
+    title: "Services",
+    fav: "https://cdn-icons-png.flaticon.com/512/2906/2906274.png",
+  },
   "/logout": {
     title: "Logging Out...",
     fav: "https://cdn-icons-png.flaticon.com/512/1828/1828479.png",

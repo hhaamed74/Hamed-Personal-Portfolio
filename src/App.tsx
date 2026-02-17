@@ -9,6 +9,7 @@ import RequireAuth from "./meta/RequireAuth";
 import Home from "./pages/Home";
 import Projects from "./pages/Projects";
 import Features from "./pages/Features";
+import Services from "./pages/Services";
 import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -23,7 +24,7 @@ import AuthRehydrate from "./services/AuthRehydrate";
 import SettingsDrawer from "./components/SettingsDrawer";
 import RouteProgress from "./components/RouteProgress";
 import ScrollToTop from "./components/ScrollToTop"; // المكون الجديد
-
+import PremiumLoader from "./components/PremiumLoader";
 /**
  * الـ Layout الأساسي للموقع
  * يضمن توزيع العناصر بشكل رأسي متناسق (Navbar -> Content -> Footer)
@@ -70,57 +71,67 @@ function Layout() {
 
 export default function App() {
   return (
-    <AppThemeProvider>
-      {/* استعادة جلسة المستخدم عند فتح الموقع */}
-      <AuthRehydrate />
+    <PremiumLoader>
+      <AppThemeProvider>
+        {/* استعادة جلسة المستخدم عند فتح الموقع */}
+        <AuthRehydrate />
 
-      {/* شريط التقدّم النحيف أعلى الصفحة عند الانتقال */}
-      <RouteProgress />
+        {/* شريط التقدّم النحيف أعلى الصفحة عند الانتقال */}
+        <RouteProgress />
 
-      <Routes>
-        <Route element={<Layout />}>
-          {/* --- المسارات العامة --- */}
-          <Route index element={<Home />} />
-          <Route path="projects" element={<Projects />} />
-          <Route path="about" element={<About />} />
+        <Routes>
+          <Route element={<Layout />}>
+            {/* --- المسارات العامة --- */}
+            <Route index element={<Home />} />
+            <Route path="projects" element={<Projects />} />
+            <Route path="about" element={<About />} />
 
-          {/* --- المسارات المحمية (تطلب تسجيل دخول) --- */}
-          <Route
-            path="features"
-            element={
-              <RequireAuth>
-                <Features />
-              </RequireAuth>
-            }
-          />
+            {/* --- المسارات المحمية (تطلب تسجيل دخول) --- */}
+            <Route
+              path="features"
+              element={
+                <RequireAuth>
+                  <Features />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="services"
+              element={
+                <RequireAuth>
+                  <Services />
+                </RequireAuth>
+              }
+            />
 
-          <Route
-            path="privacy"
-            element={
-              <RequireAuth>
-                <Privacy />
-              </RequireAuth>
-            }
-          />
+            <Route
+              path="privacy"
+              element={
+                <RequireAuth>
+                  <Privacy />
+                </RequireAuth>
+              }
+            />
 
-          <Route
-            path="terms"
-            element={
-              <RequireAuth>
-                <Terms />
-              </RequireAuth>
-            }
-          />
+            <Route
+              path="terms"
+              element={
+                <RequireAuth>
+                  <Terms />
+                </RequireAuth>
+              }
+            />
 
-          {/* --- مسارات الحساب --- */}
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-          <Route path="logout" element={<Logout />} />
+            {/* --- مسارات الحساب --- */}
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="logout" element={<Logout />} />
 
-          {/* --- صفحة الخطأ --- */}
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </AppThemeProvider>
+            {/* --- صفحة الخطأ --- */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </AppThemeProvider>
+    </PremiumLoader>
   );
 }
